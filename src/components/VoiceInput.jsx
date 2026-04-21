@@ -138,6 +138,39 @@ export default function VoiceInput({ onEntriesGenerated, variant = 'block' }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isListening, transcript, error, isProcessing]);
 
+  if (variant === 'floating') {
+    return (
+      <div style={{ position: 'fixed', bottom: '30px', right: '100px', zIndex: 1000, display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {error && (
+          <div style={{ background: 'var(--danger-light)', color: 'var(--danger)', padding: '8px 16px', borderRadius: '20px', fontSize: '0.85rem', boxShadow: 'var(--shadow)', border: '1px solid var(--danger)' }}>
+            ⚠️ {error}
+            <button onClick={() => setError(null)} style={{ background: 'transparent', border: 'none', marginLeft: '8px', cursor: 'pointer', color: 'var(--danger)' }}>✕</button>
+          </div>
+        )}
+        {isListening && (
+          <div style={{ background: 'var(--card-bg)', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--primary)', color: 'var(--primary)' }}>
+            <div style={{ width: '8px', height: '8px', background: 'var(--danger)', borderRadius: '50%', animation: 'pulse 1.5s infinite' }}></div>
+            Listening...
+          </div>
+        )}
+        {isProcessing && (
+           <div style={{ background: 'var(--card-bg)', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow)', fontSize: '0.85rem', border: '1px solid var(--border)' }}>
+             Processing...
+           </div>
+        )}
+        <button 
+          className={`chatbot-fab ${isListening ? 'active' : ''}`}
+          style={{ background: isListening ? 'var(--danger)' : 'var(--primary)', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}
+          onClick={isListening ? stopListening : startListening}
+          disabled={isProcessing}
+          title={isListening ? "Stop Recording" : "Voice Add Expense"}
+        >
+          {isListening ? '⏹️' : '🎙️'}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div style={{ marginBottom: '24px', padding: '16px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>

@@ -1,20 +1,34 @@
 import React, { useState, useContext } from 'react';
 import { FinanceProvider, FinanceContext } from './contexts/FinanceContext';
 import Dashboard from './screens/Dashboard';
-import AddExpense from './screens/AddExpense';
+import AddExpense, { CATEGORIES } from './screens/AddExpense';
 import Settings from './screens/Settings';
 import Login from './screens/Login';
 import Transactions from './screens/Transactions';
 import Rewards from './screens/Rewards';
 import BorrowLend from './screens/BorrowLend';
 import Chatbot from './components/Chatbot';
+import VoiceInput from './components/VoiceInput';
 
 function MainApp() {
   const { 
     isAuthenticated, logout, user, darkMode, setDarkMode, 
-    appSettings, setAppSettings, percentageUsed, budget 
+    appSettings, setAppSettings, percentageUsed, budget, addExpense
   } = useContext(FinanceContext);
   const [currentScreen, setCurrentScreen] = useState('dashboard');
+
+  const handleVoiceEntries = (entries) => {
+    entries.forEach(entry => {
+      const matchedCategory = CATEGORIES.find(c => c.id === entry.category?.id) || CATEGORIES[3];
+      addExpense({
+        amount: parseFloat(entry.amount),
+        category: matchedCategory,
+        date: entry.date || new Date().toISOString().split('T')[0],
+        note: entry.note || ''
+      });
+    });
+    alert(`Successfully added ${entries.length} expense(s) from voice!`);
+  };
 
   if (!isAuthenticated) {
     return <Login />;
@@ -152,6 +166,10 @@ function MainApp() {
         {currentScreen === 'add' && <AddExpense setCurrentScreen={setCurrentScreen} />}
         {currentScreen === 'settings' && <Settings />}
       </main>
+      
+      {currentScreen === 'dashboard' && (
+        <VoiceInput variant="floating" onEntriesGenerated={handleVoiceEntries} />
+      )}
       <Chatbot />
     </div>
   );
